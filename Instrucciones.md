@@ -126,3 +126,33 @@ docker compose ps
 # Pulsar "Generar carga de CPU (30s)" en http://localhost:8080
 # Observar en Alerting → Alert rules: Normal → Pending → Firing
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+## Preguntas
+
+**1. ¿Por qué necesitamos Loki además de Prometheus si ya tenemos `/metrics`?**
+
+Prometheus guarda números en el tiempo, pero no sirve para guardar texto. Loki guarda las líneas de log (errores, eventos, trazas). Son señales distintas: las métricas nos dice que pasó, los logs te dicen por qué. Sin Loki no podriamos ver los mensajes de error concretos de las apps.
+
+**2. ¿Qué ventaja aporta que las fuentes de datos estén aprovisionadas como código?**
+
+Que si intentamos levantar el stack obtenemos exactamente la misma configuración sin tocar nada a mano. Está versionado en Git, es reproducible y no depende de que alguien recuerde hacer clic en la interfaz.
+
+**3. El panel "CPU contenedor" y el panel "CPU host" pueden mostrar valores muy distintos. ¿Por qué? ¿Cuál usarías para alertar sobre una aplicación concreta?**
+
+El panel de contenedor mide solo el consumo del backend (cadvisor). El del host mide toda la máquina promediada entre todos los núcleos y procesos. Para alertar sobre una app concreta se usa el panel de contenedor, porque aísla la app.
+
+**4. ¿Qué diferencia hay entre evaluation interval y pending period?**
+
+El evaluation interval es cada cuánto Grafana evalúa la condición. 
+El pending period es cuánto tiempo debe mantenerse la condición antes de pasar a Firing. Esto nos irve para evitar falsas alarmas por picos cortos: si la CPU sube solo un instante, no se dispara.
